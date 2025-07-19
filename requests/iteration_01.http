@@ -3,7 +3,7 @@ POST http://localhost:4111/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "kate1998",
+   "username": "User1",
   "password": "verysTRongPassword33$"
 }
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 Authorization: Basic YWRtaW46YWRtaW4=
 
 {
-  "username": "Newkate1998",
+  "username": "User2",
   "password": "verysTRongPassword33$",
   "role": "USER"
 }
@@ -122,9 +122,186 @@ Authorization: Basic YWRtaW46YWRtaW4=
 ### Positive Test Create account
 POST http://localhost:4111/api/v1/accounts
 Content-Type: application/json
-Authorization: Basic a2F0ZTE5OTg6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
 
 ### Positive Test Check Account was created
 GET http://localhost:4111/api/v1/customer/accounts
 Content-Type: application/json
-Authorization: Basic a2F0ZTE5OTg6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+
+### Iteration 2 authorization Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+///
+/// authorization Basic VXNlcjE6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+GET http://localhost:4111/api/v1/customer/accounts
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+### Positive test Авторизованный юзер может пополнять свой счет
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "id": 1,
+  "balance": 100
+}
+
+### Positive test Авторизованный юзер может пополнять свой счет c цфирами после запятой - надо уточнять
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "id": 1.7,
+  "balance": 100
+}
+
+### Negative test не Авторизованный юзер не может пополнять свой счет
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+
+{
+  "id": 1,
+  "balance": 100
+}
+
+### Negative test авторизованный юзер не может пополнять не существующий счет
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "id": 2,
+  "balance": 100
+}
+
+### Negative test авторизованный юзер не может пополнять баланс на 0 отрицательное число -1
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "id": 1,
+  "balance": 0
+}
+
+### Negative test авторизованный юзер не может пополнять баланс на отрицательное число -1
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "id": 1,
+  "balance": -1
+}
+
+### Positive test Перевод денег с одного аккаунта на другой не больше баланса аккаунта отправителя
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 50
+}
+
+### Positive test Перевод ВСЕХ денег с одного аккаунта на другой не больше баланса аккаунта отправителя
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 451
+}
+
+### Negative test Перевод 0 денег с одного аккаунта на другой
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 0
+}
+
+### Negative test Перевод отрицательного количества денег с одного аккаунта на другой
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": -1
+}
+
+### Negative test Перевод денег самому себе
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 1,
+  "amount": 10
+}
+
+### Negative test Перевод денег на несуществующий счет получателя
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 11,
+  "amount": 10
+}
+
+### Negative test Перевод денег от несуществующего счета
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "senderAccountId": 101,
+  "receiverAccountId": 11,
+  "amount": 10
+}
+
+### Авторизованный юзер может видеть транзакции своих счетов
+GET http://localhost:4111/api/v1/accounts/2/transactions
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+### Positive test Изменение имени пользователя на валидное - надо уточнить требования
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "name": "Green"
+}
+
+### Negative test Изменение имени пользователя на пустое
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "name": " "
+}
+
+
+### Negative test Изменение имени пользователя длина вне необходимо количества символов
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
+
+{
+  "name": " "
+}
