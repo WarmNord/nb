@@ -3,8 +3,8 @@ POST http://localhost:4111/api/v1/auth/login
 Content-Type: application/json
 
 {
-   "username": "User1",
-  "password": "verysTRongPassword33$"
+   "username": "admin",
+  "password": "admin"
 }
 
 ### Positive Test Admin can create new user with correct data
@@ -143,11 +143,11 @@ Content-Type: application/json
 Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
 
 {
-  "id": 1,
+  "id": 2,
   "balance": 100
 }
 
-### Positive test Авторизованный юзер может пополнять свой счет c цфирами после запятой - надо уточнять
+### Negative test Авторизованный юзер не может пополнять свой счет c цифрами после запятой
 POST http://localhost:4111/api/v1/accounts/deposit
 Content-Type: application/json
 Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
@@ -176,7 +176,7 @@ Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
   "balance": 100
 }
 
-### Negative test авторизованный юзер не может пополнять баланс на 0 отрицательное число -1
+### Negative test авторизованный юзер не может пополнять баланс на 0
 POST http://localhost:4111/api/v1/accounts/deposit
 Content-Type: application/json
 Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
@@ -303,5 +303,5 @@ Content-Type: application/json
 Authorization: Basic VXNlcjI6dmVyeXNUUm9uZ1Bhc3N3b3JkMzMk
 
 {
-  "name": " "
+  "name": "                                                              "
 }
